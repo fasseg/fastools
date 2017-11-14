@@ -12,7 +12,7 @@ function print_error()
 
 function print_usage()
 {
-    echo -e "\nUsage: $SCRIPT_NAME <options> [status|toggle|list]"
+    echo -e "\nUsage: $SCRIPT_NAME <options> [status|toggle|list|performance|powersafe]"
     echo -e "\nOptions:"
     echo -e "\t-h\t\tShow this help"
 }
@@ -58,9 +58,17 @@ function get_status()
     done
 }
 
+function set_govenor()
+{
+  cpus=$(enumerate_cpus)
+  for cpu in $cpus;do
+      $CPUFREQ_BINARY -c ${cpu:3} -g $1
+  done
+}
+
 # Check the options of the command line
 while getopts ":h" opt;do
-    case opt in
+    case $opt in
         h)
             print_usage
             exit 0
@@ -93,6 +101,12 @@ case $ACTION in
         ;;
     list)
         enumerate_cpus
+        ;;
+    performance)
+        set_govenor performance
+        ;;
+    powersafe)
+        set_govenor powersafe
         ;;
     *)
         print_error "Invalid action: $ACTION"
